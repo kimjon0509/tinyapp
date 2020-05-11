@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/kimjon0509/tinyapp/issues"
   },
-  "homepage": "https://github.com/kimjon0509/tinyapp#readme"
+  "homepage": "https://github.com/kimjon0509/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
