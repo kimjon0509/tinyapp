@@ -11,23 +11,23 @@
       </div>
     </div>
     <% if (!user) {%>
-      <form class="form-inline" action="/login" method="GET">
-        <div class="form-group mb-2">
-          <button type="submit" class="btn">Login</button>
-        </div>
-      </form>
-      <form class="form-inline" action="/register" method="GET">
-        <div class="form-group mb-2">
-          <button type="submit" class="btn">Register</button>
-        </div>
-      </form>
+      <ul class="nav justify-content-end">
+        <li class="nav-item">
+          <a style="color:white" class="nav-link active" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+          <a style="color:white" class="nav-link active" href="/register">Register</a>
+        </li>
+      </ul>
     <%} else{ %>
-      <form class="form-inline" action="/logout" method="POST">
-        <div class="form-group mb-2">
-          <input type="text" readonly class="form-control-plaintext" value="Logged in as: <%=user.email%>" width="">
-          <button type="submit" class="btn btn-outline-dark">Logout</button>
+      <div class="form-row align-items-center">
+        <div class="col-auto">
+          <form class="form-inline" action="/logout" method="POST">
+            <input type="text" readonly class="form-control-plaintext" value="Logged in as: <%=user.email%>" width="">
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+          </form>
         </div>
-      </form>
+      </div>
     <% } %>
   </nav>
 </header>
