@@ -39,13 +39,13 @@ const loadNewURL = (req, res, templateVars) => {
   res.redirect('/login');
 };
 
-const cookieMatch = (req, shortURL) => {
+const cookieMatch = (req, urlDatabase, shortURL) => {
   return req.session["user_id"] === urlDatabase[shortURL].userID;
 };
 
-const clearCookie = (res, req, urlDatabase) => {
+const deleteURL = (res, req, urlDatabase) => {
   let shortURL = req.params.shortURL;
-  if (cookieMatch(req)) {
+  if (cookieMatch(req, urlDatabase, shortURL)) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
   }
@@ -64,16 +64,16 @@ const createNewURL = (res, req, urlDatabase, templateVars) => {
   res.status(403).send();
 };
 
-const authentication = (req ,res) => {
+const authentication = (req ,res, users) => {
   const checkUser = checkUserRegistered(req, users);
   if (checkUser) {
     if (bcrypt.compareSync(req.body.password, checkUser.password)) {
       req.session.user_id = checkUser.id;
-      res.redirect('/urls');
+      return res.redirect('/urls');
     }
-    res.status(403).send();
+    return res.status(403).send("Email/Password is wrong");
   }
-  res.status(403).send();
+  return res.status(403).send("Email/Password is wrong");
 };
 
 const registerUser = (req, res, users) => {
@@ -88,8 +88,8 @@ const registerUser = (req, res, users) => {
     req.session.user_id = user_id;
     res.redirect('/urls');
   } else {
-    res.status(403).send();
+    res.status(403).send("This email is already registered");
   }
 };
 
-module.exports = { generateRandomString, loadNewURL, clearCookie, createNewURL, authentication, registerUser, getUserByEmail };
+module.exports = { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, getUserByEmail };

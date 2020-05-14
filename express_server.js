@@ -4,7 +4,7 @@ const PORT = 8080;
 
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-const { generateRandomString, loadNewURL, clearCookie, createNewURL, authentication, registerUser } = require('./helper_function');
+const { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser } = require('./helper_function');
 const { urlDatabase, users } = require('./database');
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -50,7 +50,7 @@ app.post("/urls", (req, res) => {
 
 
 app.post("/urls/:shortURL/delete", (req,res) => {
-  clearCookie(res, req, urlDatabase);
+  deleteURL(res, req, urlDatabase); //fix function name
 });
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -67,7 +67,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  authentication(req, res);
+  authentication(req, res, users);
 });
 
 app.post('/logout', (req, res) => {
