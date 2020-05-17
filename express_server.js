@@ -26,7 +26,7 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]],
   };
-  loadNewURL(req, res, templateVars);
+  loadNewURL(req) ? res.render("urls_new", templateVars) : res.redirect('/login');
 });
 
 // NEED to check if the cookie matches the url id if not it should return an error message 
@@ -54,11 +54,11 @@ app.post("/urls", (req, res) => {
 
 
 app.post("/urls/:shortURL/delete", (req,res) => {
-  deleteURL(res, req, urlDatabase); //fix function name
+  deleteURL(res, req, urlDatabase) ? res.redirect('/urls') : res.status(403).send();
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  createNewURL(res, req, urlDatabase);
+  createNewURL(res, req, urlDatabase) ? res.redirect(`/urls/${shortURL}`) : res.status(403).send();
 });
 
 app.get('/login', (req, res) => {
@@ -71,7 +71,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  authentication(req, res, users);
+  authentication(req, res, users) ? res.redirect('/urls') : res.status(403).send("Email/Password is wrong");
 });
 
 app.post('/logout', (req, res) => {
@@ -88,7 +88,14 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  registerUser(req, res, users);
+  const registerOutput = registerUser(req, res, users);
+  if (registerOutput === 'registered') {
+    res.redirect('/urls');
+  } else if (registerOutput === 'notVaildInput') {
+    res.status(403).send("Not a vaild email/password")
+  } else {
+    res.status(403).send("This email is already registered");
+  }
 });
 
 app.get('/u/:shortURL', (req, res) => {

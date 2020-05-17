@@ -32,11 +32,8 @@ const cookieExists = (req) => {
   return req.session["user_id"];
 };
 
-const loadNewURL = (req, res, templateVars) => {
-  if (cookieExists(req)) {
-    res.render("urls_new", templateVars);
-  }
-  res.redirect('/login');
+const loadNewURL = (req) => {
+  return cookieExists(req)
 };
 
 const cookieMatch = (req, urlDatabase) => {
@@ -47,9 +44,9 @@ const cookieMatch = (req, urlDatabase) => {
 const deleteURL = (res, req, urlDatabase) => {
   if (cookieMatch(req, urlDatabase)) {
     delete urlDatabase[shortURL];
-    res.redirect('/urls');
+    return true;
   }
-  res.status(403).send();
+  return false;
 };
 
 const createNewURL = (res, req, urlDatabase, templateVars) => {
@@ -59,9 +56,9 @@ const createNewURL = (res, req, urlDatabase, templateVars) => {
       longURL:req.body.longURL,
       userID: req.session["user_id"],
     };
-    res.redirect(`/urls/${shortURL}`);
+    return true;
   }
-  res.status(403).send();
+  return false;
 };
 
 const authentication = (req ,res, users) => {
@@ -69,11 +66,11 @@ const authentication = (req ,res, users) => {
   if (checkUser) {
     if (bcrypt.compareSync(req.body.password, checkUser.password)) {
       req.session.user_id = checkUser.id;
-      return res.redirect('/urls');
+      return true;
     }
-    return res.status(403).send("Email/Password is wrong");
+    return false;
   }
-  return res.status(403).send("Email/Password is wrong");
+  return false;
 };
 
 const registerUser = (req, res, users) => {
@@ -89,12 +86,12 @@ const registerUser = (req, res, users) => {
         password: bcrypt.hashSync(password, 10),
       };
       req.session.user_id = user_id;
-      res.redirect('/urls');
+      return "registered";
     } else {
-      res.status(403).send("Not a vaild email/password")
+      return "notVaildInput";
     }
   } else {
-    res.status(403).send("This email is already registered");
+    return "already registered"
   }
 };
 
