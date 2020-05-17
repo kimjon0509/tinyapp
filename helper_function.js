@@ -39,13 +39,13 @@ const loadNewURL = (req, res, templateVars) => {
   res.redirect('/login');
 };
 
-const cookieMatch = (req, urlDatabase, shortURL) => {
+const cookieMatch = (req, urlDatabase) => {
+  let shortURL = req.params.shortURL;
   return req.session["user_id"] === urlDatabase[shortURL].userID;
 };
 
 const deleteURL = (res, req, urlDatabase) => {
-  let shortURL = req.params.shortURL;
-  if (cookieMatch(req, urlDatabase, shortURL)) {
+  if (cookieMatch(req, urlDatabase)) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
   }
@@ -54,12 +54,12 @@ const deleteURL = (res, req, urlDatabase) => {
 
 const createNewURL = (res, req, urlDatabase, templateVars) => {
   let shortURL = req.params.shortURL;
-  if (cookieMatch(req)) {
+  if (cookieMatch(req, urlDatabase)) {
     urlDatabase[shortURL] = {
       longURL:req.body.longURL,
       userID: req.session["user_id"],
     };
-    res.redirect(`/urls/${shortURL}`,templateVars);
+    res.redirect(`/urls/${shortURL}`);
   }
   res.status(403).send();
 };
@@ -78,18 +78,24 @@ const authentication = (req ,res, users) => {
 
 const registerUser = (req, res, users) => {
   const userRegistered = checkUserRegistered(req, users);
+  const email = req.body.email;
+  const password = req.body.password;
   if (!userRegistered) {
-    user_id = generateRandomString(5);
-    users[user_id] = {
-      id: user_id,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
-    };
-    req.session.user_id = user_id;
-    res.redirect('/urls');
+    if ( email && password) {
+      user_id = generateRandomString(5);
+      users[user_id] = {
+        id: user_id,
+        email,
+        password: bcrypt.hashSync(password, 10),
+      };
+      req.session.user_id = user_id;
+      res.redirect('/urls');
+    } else {
+      res.status(403).send("Not a vaild email/password")
+    }
   } else {
     res.status(403).send("This email is already registered");
   }
 };
 
-module.exports = { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, getUserByEmail };
+module.exports = { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, getUserByEmail, cookieMatch };
