@@ -4,7 +4,7 @@ const PORT = 8080;
 
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-const { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser } = require('./helper_function');
+const { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, cookieMatch } = require('./helper_function');
 const { urlDatabase, users } = require('./database');
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -29,6 +29,7 @@ app.get("/urls/new", (req, res) => {
   loadNewURL(req, res, templateVars);
 });
 
+// NEED to check if the cookie matches the url id if not it should return an error message 
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
     urls: urlDatabase,
@@ -36,7 +37,10 @@ app.get('/urls/:shortURL', (req, res) => {
     longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.session["user_id"]],
   };
+  if (cookieMatch(req, urlDatabase)) {
   res.render("urls_show", templateVars);
+  }
+  res.status(403).send("Please Login to view this page")
 });
 
 app.post("/urls", (req, res) => {
@@ -86,6 +90,10 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   registerUser(req, res, users);
 });
+
+app.get('/u/:shortURL', (req, res) => {
+  res.redirect(urlDatabase[req.params.shortURL].longURL)
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
