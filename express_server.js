@@ -14,6 +14,7 @@ app.use(cookieSession({
 }));
 app.set('view engine', 'ejs');
 
+// main page
 app.get('/urls', (req, res) => {
   let templateVars = {
     urls: urlDatabase,
@@ -22,25 +23,12 @@ app.get('/urls', (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// creating new url page 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]],
   };
   loadNewURL(req) ? res.render("urls_new", templateVars) : res.redirect('/login');
-});
-
-// NEED to check if the cookie matches the url id if not it should return an error message 
-app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session["user_id"]],
-  };
-  if (cookieMatch(req, urlDatabase)) {
-  res.render("urls_show", templateVars);
-  }
-  res.status(403).send("Please Login to view this page")
 });
 
 app.post("/urls", (req, res) => {
@@ -52,15 +40,32 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-
-app.post("/urls/:shortURL/delete", (req,res) => {
-  deleteURL(res, req, urlDatabase) ? res.redirect('/urls') : res.status(403).send();
+ // short url page 
+app.get('/urls/:shortURL', (req, res) => {
+  let templateVars = {
+    urls: urlDatabase,
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    user: users[req.session["user_id"]],
+  };
+  if (cookieMatch(req, urlDatabase)) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(403).send("You do not have access to this page")
+  }
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  createNewURL(res, req, urlDatabase) ? res.redirect(`/urls/${shortURL}`) : res.status(403).send();
+  let shortURL = req.params.shortURL;
+  createNewURL(req, urlDatabase) ? res.redirect(`/urls/${shortURL}`) : res.status(403).send();
 });
 
+// delete  url from database
+app.post("/urls/:shortURL/delete", (req,res) => {
+  deleteURL(req, urlDatabase) ? res.redirect('/urls') : res.status(403).send();
+});
+
+// login page
 app.get('/login', (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -71,14 +76,16 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  authentication(req, res, users) ? res.redirect('/urls') : res.status(403).send("Email/Password is wrong");
+  authentication(req, users) ? res.redirect('/urls') : res.status(403).send("Email/Password is wrong");
 });
 
+// logout request
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
 
+//register page
 app.get('/register', (req, res) => {
   let templateVars = {
     urls: urlDatabase,
@@ -88,7 +95,7 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const registerOutput = registerUser(req, res, users);
+  const registerOutput = registerUser(req, users);
   if (registerOutput === 'registered') {
     res.redirect('/urls');
   } else if (registerOutput === 'notVaildInput') {
@@ -98,6 +105,7 @@ app.post('/register', (req, res) => {
   }
 });
 
+//redirect to longurl
 app.get('/u/:shortURL', (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL].longURL)
 })
@@ -105,3 +113,5 @@ app.get('/u/:shortURL', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+//NOt being able to click on short url to long url after editing
