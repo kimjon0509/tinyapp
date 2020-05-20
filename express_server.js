@@ -23,7 +23,7 @@ app.get('/urls', (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// creating new url page 
+// creating new url page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]],
@@ -40,7 +40,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
- // short url page 
+// short url page
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
     urls: urlDatabase,
@@ -51,7 +51,7 @@ app.get('/urls/:shortURL', (req, res) => {
   if (cookieMatch(req, urlDatabase)) {
     res.render("urls_show", templateVars);
   } else {
-    res.status(403).send("You do not have access to this page")
+    res.status(403).send("You do not have access to this page");
   }
 });
 
@@ -99,7 +99,7 @@ app.post('/register', (req, res) => {
   if (registerOutput === 'registered') {
     res.redirect('/urls');
   } else if (registerOutput === 'notVaildInput') {
-    res.status(403).send("Not a vaild email/password")
+    res.status(403).send("Not a vaild email/password");
   } else {
     res.status(403).send("This email is already registered");
   }
@@ -107,8 +107,8 @@ app.post('/register', (req, res) => {
 
 //redirect to longurl
 app.get('/u/:shortURL', (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL].longURL)
-})
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

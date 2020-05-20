@@ -37,7 +37,7 @@ const cookieExists = (req) => {
 };
 
 const loadNewURL = (req) => {
-  return cookieExists(req)
+  return cookieExists(req);
 };
 
 //check if cookie match with the database
@@ -60,7 +60,7 @@ const createNewURL = (req, urlDatabase) => {
   if (cookieMatch(req, urlDatabase)) {
     if (req.body.longURL.includes('http://')) {
       urlDatabase[shortURL].longURL = req.body.longURL;
-    } else{
+    } else {
       urlDatabase[shortURL].longURL = `http://${req.body.longURL}`;
     }
     return true;
@@ -87,7 +87,7 @@ const registerUser = (req, users) => {
   const email = req.body.email;
   const password = req.body.password;
   if (!userRegistered) {
-    if ( email && password) {
+    if (email && password) {
       user_id = generateRandomString(5);
       users[user_id] = {
         id: user_id,
@@ -100,7 +100,7 @@ const registerUser = (req, users) => {
       return "notVaildInput";
     }
   } else {
-    return "already registered"
+    return "already registered";
   }
 };
 
