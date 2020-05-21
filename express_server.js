@@ -65,12 +65,20 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.post('/urls/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
-  createNewURL(req, urlDatabase) ? res.redirect(`/urls/${shortURL}`) : res.status(403).send();
+  if (createNewURL(req, urlDatabase)) {
+    res.redirect(`/urls/${shortURL}`)
+   } else {
+  res.status(403).send();
+   }
 });
 
 // delete  url from database
 app.post("/urls/:shortURL/delete", (req,res) => {
-  deleteURL(req, urlDatabase) ? res.redirect('/urls') : res.status(403).send();
+  if (deleteURL(req, urlDatabase)) {
+    res.redirect('/urls') 
+  } else {
+    res.status(403).send();
+  }
 });
 
 // login page
@@ -84,7 +92,11 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  authentication(req, users) ? res.redirect('/urls') : res.status(403).send("Email/Password is wrong");
+  if(authentication(req, users)) {
+    res.redirect('/urls')
+  } else {
+    res.status(403).send("Email/Password is wrong");
+  }
 });
 
 // logout request
