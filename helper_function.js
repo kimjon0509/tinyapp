@@ -31,15 +31,6 @@ const checkUserRegistered = (req, users) => {
   }
 };
 
-//check if cookie exists
-const cookieExists = (req) => {
-  return req.session["user_id"];
-};
-
-const loadNewURL = (req) => {
-  return cookieExists(req);
-};
-
 //check if cookie match with the database
 const cookieMatch = (req, urlDatabase) => {
   let shortURL = req.params.shortURL;
@@ -54,7 +45,7 @@ const deleteURL = (req, urlDatabase) => {
   return false;
 };
 
-//edit long url
+//when user sumbits an url edit, it will change the long url in the database
 const createNewURL = (req, urlDatabase) => {
   let shortURL = req.params.shortURL;
   if (cookieMatch(req, urlDatabase)) {
@@ -81,7 +72,7 @@ const authentication = (req, users) => {
   return false;
 };
 
-//register user if not yet registered
+//register user if not yet registered, checks if the email and password are of vaild types.
 const registerUser = (req, users) => {
   const userRegistered = checkUserRegistered(req, users);
   const email = req.body.email;
@@ -104,4 +95,4 @@ const registerUser = (req, users) => {
   }
 };
 
-module.exports = { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, getUserByEmail, cookieMatch };
+module.exports = { generateRandomString, deleteURL, createNewURL, authentication, registerUser, getUserByEmail, cookieMatch };
