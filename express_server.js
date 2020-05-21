@@ -4,7 +4,7 @@ const PORT = 8080;
 
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-const { generateRandomString, loadNewURL, deleteURL, createNewURL, authentication, registerUser, cookieMatch } = require('./helper_function');
+const { generateRandomString, deleteURL, createNewURL, authentication, registerUser, cookieMatch } = require('./helper_function');
 const { urlDatabase, users } = require('./database');
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -20,7 +20,11 @@ app.get('/urls', (req, res) => {
     urls: urlDatabase,
     user: users[req.session["user_id"]],
   };
-  res.render("urls_index", templateVars);
+  if (req.session["user_id"]) {
+    res.render("urls_index", templateVars);
+  } else {
+    res.redirect('/login')
+  }
 });
 
 // creating new url page
@@ -28,7 +32,11 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]],
   };
-  loadNewURL(req) ? res.render("urls_new", templateVars) : res.redirect('/login');
+  if(req.session["user_id"]) {
+    res.render("urls_new", templateVars) 
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.post("/urls", (req, res) => {
